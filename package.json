@@ -1,0 +1,26 @@
+{
+  "name": "tonite",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "discord": "tsc && node dist/Discord/index",
+    "register": "tsc && node dist/Discord/remove-commands && node dist/Discord/deploy-commands"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/builders": "^0.14.0",
+    "@discordjs/rest": "^0.5.0",
+    "discord-api-types": "^0.33.3",
+    "discord.js": "^13.8.0",
+    "reflect-metadata": "^0.1.13",
+    "sqlite3": "^5.0.8",
+    "typeorm": "^0.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/sqlite3": "^3.1.8"
+  }
+}
