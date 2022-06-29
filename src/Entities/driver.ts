@@ -1,21 +1,27 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm"
-import { Event } from './event'
+import { Event } from "./event"
 import { Passenger } from "./passenger"
 
 @Entity()
 export class Driver {
     @PrimaryGeneratedColumn("uuid")
-    id!: number
+    id!: string
 
     @Column()
-    discordId!: string
+    discordId: string
 
     @ManyToOne(() => Event, (event) => event.drivers)
-    event!: Event
+    event: Event
 
     @OneToMany(() => Passenger, (passenger) => passenger.driver )
-    passengers!: Passenger[]
+    passengers?: Passenger[]
 
     @Column()
-    seats!: number
+    seats: number
+
+    constructor(event: Event, discordId: string, seats: number) {
+        this.event = event
+        this.discordId = discordId
+        this.seats = seats
+    }
 }

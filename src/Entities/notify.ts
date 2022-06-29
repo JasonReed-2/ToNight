@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm"
-import { Event } from './event'
+import { Event } from "./event"
 
 @Entity()
 export class Notify {
@@ -7,8 +7,13 @@ export class Notify {
     id!: number
 
     @Column()
-    discordId!: string
+    discordId: string
 
     @ManyToOne(() => Event, (event) => event.notify_list)
-    event!: Event
+    event: Event
+
+    constructor(event: Event, discordId: string) {
+        this.event = event
+        this.discordId = discordId
+    }
 }

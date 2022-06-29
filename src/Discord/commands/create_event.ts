@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
 import { CommandInteraction } from 'discord.js'
-import { data_source } from '../../Database_Code/datasource'
-import { Event } from '../../Database_Code/event'
+import { data_source } from '../../datasource'
+import { Event } from '../../Entities/event'
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -9,8 +9,7 @@ module.exports = {
 		.setDescription('Creates a new event.')
         .addStringOption(option =>
             option.setName('name').setDescription('The name of the event.').setRequired(true)
-        )
-        ,
+        ),
 	async execute(interaction: CommandInteraction) {
         if (interaction.guildId === null) {
             await interaction.reply('No Guild ID!')

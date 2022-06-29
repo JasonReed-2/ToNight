@@ -1,6 +1,8 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
 import { CommandInteraction } from 'discord.js'
-import { Event } from '../../Database_Code/event'
+import { Driver } from '../../Entities/driver'
+import { Event } from '../../Entities/event'
+import { data_source } from '../../datasource'
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -13,33 +15,26 @@ module.exports = {
             option.setName('seats').setDescription('How many seats you have in your car').setRequired(true)
         ),
 	async execute(interaction: CommandInteraction) {
-        // TODO
-        // const event_id = interaction.options.getString('eventid', true)
-        // const possible_events = (await get_from_db<Event>(db, 'scheduledEvent')).filter((val) => val.eventid === event_id)
-        // if (possible_events.length === 0) {
-        //     await interaction.reply('This is not a valid event!')
-        //     return
-        // }
+        const event_id = interaction.options.getString('eventid', true)
+        const event = await data_source.getRepository(Event).findOneBy({
+            id: event_id
+        })
+        if (event === null) {
+            await interaction.reply('This is not a valid event!')
+            return
+        }
 
-        // const seats = interaction.options.getInteger('seats', true)
-        // const driver_id = unique_id().toString()
-        // const discord_id = interaction.member?.user.id
-        // if (discord_id === undefined) {
-        //     await interaction.reply('No Member ID!')
-        //     return
-        // }
-        // try {
-        //     insert_into_db(db, driver_table_factory({
-        //         eid: event_id,
-        //         seats: seats,
-        //         discordid: discord_id,
-        //         driverid: driver_id
-        //     }))
-        // } catch {
-        //     await interaction.reply('SQL Insertion Error')
-        //     return
-        // }
+        const seats = interaction.options.getInteger('seats', true)
 
-        //await interaction.reply(`Registered as a driver For ${possible_events[0].eventname} with ${seats} seats. Your Driver ID is: ${driver_id}`)
+        const discord_id = interaction.member?.user.id
+        if (discord_id === undefined) {
+            await interaction.reply('No Member ID!')
+            return
+        }
+
+        const driver = new Driver(event, discord_id, seats)
+        await data_source.getRepository(Driver).save(driver)
+
+        await interaction.reply(`Registered as a driver For ${event.eventName} with ${seats} seats. Your Driver ID is: ${driver.id}`)
 	},
 };

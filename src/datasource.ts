@@ -1,8 +1,8 @@
 import { DataSource } from "typeorm"
-import { Event } from './event'
-import { Driver } from "./driver"
-import { Passenger } from "./passenger"
-import { Notify } from './notify'
+import { Driver } from './Entities/driver'
+import { Event } from './Entities/event'
+import { Passenger } from './Entities/passenger'
+import { Notify } from './Entities/notify'
 
 const CLEAN_DB = true
 
