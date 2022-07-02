@@ -12,6 +12,12 @@ export class Event {
     
     @Column()
     guildId: string
+
+    @Column()
+    location: string
+
+    @Column()
+    date: string
     
     @OneToMany(() => Driver, (driver) => driver.event)
     drivers?: Driver[]
@@ -19,8 +25,10 @@ export class Event {
     @OneToMany(() => Notify, (notify) => notify.event)
     notify_list?: Notify[]
 
-    constructor(event_name: string, guild_id: string) {
+    constructor(event_name: string, guild_id: string, location: string, date: string) {
         this.eventName = event_name
         this.guildId = guild_id
+        this.location = location
+        this.date = date
     }
 }
