@@ -9,12 +9,7 @@ export const get_available_seats = async (driver: Driver) => {
 }
 
 export const get_event = async (driver: Driver) => {
-    const events = await data_source.getRepository(Event).find()
-    for (let event of events) {
-        const drivers = await data_source.getRepository(Driver).findBy({event: event})
-        for (let curr_driver of drivers) {
-            if (curr_driver.id === driver.id) return event
-        }
-    }
-    return null
+    const event = await data_source.getRepository(Event).createQueryBuilder("event").leftJoinAndSelect("event.drivers", "driver").
+    where("driver.id = :driverid", {driverid: driver.id}).getOne()
+    return event
 }

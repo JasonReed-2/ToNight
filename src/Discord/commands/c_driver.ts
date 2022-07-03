@@ -46,6 +46,29 @@ module.exports = {
 
 const register_driver = async (interaction: CommandInteraction) => {
     const event_id = interaction.options.getString('eventid', true)
+    const discord_id = interaction.member?.user.id
+    if (discord_id === undefined) {
+        await interaction.reply('No Member ID.')
+        return
+    }
+
+    const already_driver = await data_source.getRepository(Driver).createQueryBuilder("driver").leftJoinAndSelect("driver.event", "event")
+    .where("event.id = :eventid", {eventid: event_id}).andWhere("driver.discordid = :did", {did: discord_id}).getCount() > 0 ? true : false
+
+    if (already_driver) {
+        await interaction.reply('You are already a driver for this event.')
+        return
+    }
+
+    const already_passenger = await data_source.getRepository(Passenger).createQueryBuilder('passenger').leftJoinAndSelect('passenger.driver', "driver").
+    leftJoinAndSelect('driver.event', 'event').where("event.id = :eventid", {eventid: event_id}).andWhere('passenger.discordid = :did', {did: discord_id})
+    .getCount() > 0 ? true : false
+
+    if (already_passenger) {
+        await interaction.reply('You are already a passenger to this event.')
+        return
+    }
+
     const event = await data_source.getRepository(Event).findOneBy({
         id: event_id
     })
@@ -58,12 +81,6 @@ const register_driver = async (interaction: CommandInteraction) => {
     const seats = interaction.options.getInteger('seats', true)
     if (seats <= 0) {
         await interaction.reply('Not Enough Seats.')
-        return
-    }
-
-    const discord_id = interaction.member?.user.id
-    if (discord_id === undefined) {
-        await interaction.reply('No Member ID.')
         return
     }
     
@@ -123,9 +140,6 @@ const become_passenger = async (interaction: CommandInteraction) => {
         return
     }
 
-    const passenger = new Passenger(driver, discord_id)
-    await data_source.getRepository(Passenger).save(passenger)
-
     const member_list = await interaction.guild?.members.list()
     if (member_list === undefined) {
         await interaction.reply('No members in this guild.')
@@ -138,5 +152,18 @@ const become_passenger = async (interaction: CommandInteraction) => {
         await interaction.reply('Error in event!')
         return
     }
+
+    const already_passenger = await data_source.getRepository(Passenger).createQueryBuilder('passenger').leftJoinAndSelect('passenger.driver', "driver").
+    leftJoinAndSelect('driver.event', 'event').where("event.id = :eventid", {eventid: event.id}).andWhere('passenger.discordid = :did', {did: discord_id})
+    .getCount() > 0 ? true : false
+
+    if (already_passenger) {
+        await interaction.reply('You are already a passenger to this event.')
+        return
+    }
+
+    const passenger = new Passenger(driver, discord_id)
+    await data_source.getRepository(Passenger).save(passenger)
+
     await interaction.reply(`You are now riding with ${disc_driver?.displayName} to ${event.eventName}. Available seats left: ${available_seats - 1}`)
 }
